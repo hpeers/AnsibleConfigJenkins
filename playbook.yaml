@@ -1,0 +1,79 @@
+- hosts: all  
+  become: yes
+  ignore_errors: true
+  vars:
+  tasks:
+
+    - name: Update apt cache
+      apt: update_cache=yes cache_valid_time=3600
+
+    - name: Upgrade all apt packages
+      apt: upgrade=dist
+
+    - name: Install dependencies
+      apt:
+        name: "{{ packages }}"
+        state: present
+        update_cache: yes
+      vars:
+        packages:
+        - openjdk-8-jre
+        - curl
+        - git
+
+    - name: Add jenkins user and append to admin group
+      user:
+        name: jenkins
+        shell: /bin/bash
+        password: ''
+        groups: admin
+        append: yes
+
+    - name: Install acl for Ubuntu Focal
+      apt:
+        name: acl
+        state: present
+
+    - name: make direcotry
+      file:
+        path: "/home/jenkins/.ssh"
+        state: directory
+        owner: jenkins 
+
+    - name: create empty file
+      file:
+        path: "/home/jenkins/.ssh/authorized_keys"
+        state: touch
+        owner: jenkins
+
+    - name: put pubkey
+      lineinfile:
+        path: "/home/jenkins/.ssh/authorized_keys"
+        line: "{{ pubkey }}"
+        owner: jenkins
+
+    - name: Import a key from a url
+      ansible.builtin.apt_key:
+        url: https://pkg.jenkins.io/debian/jenkins.io.key
+        state: present  
+
+    - name: download jenkins binary
+      command: echo "deb https://pkg.jenkins.io/debian-stable binary/" | tee /etc/apt/sources.list.d/jenkins.list
+
+    - name: install jenkins
+      apt:
+        name: jenkins
+        state: present
+        update_cache: yes
+
+    - name: Just force systemd to re-execute itself
+      ansible.builtin.systemd:
+        daemon_reload: yes
+      
+    - name: start service jenkins
+      ansible.builtin.systemd:
+        name: jenkins
+        state: started
+
+    - name: get password
+      command: cat /var/lib/jenkins/secrets/initialAdminPassword
