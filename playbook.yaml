@@ -1,7 +1,5 @@
-- hosts: all  
+- hosts: jenkins  
   become: yes
-  ignore_errors: true
-  vars:
   tasks:
 
     - name: Update apt cache
@@ -34,31 +32,16 @@
         name: acl
         state: present
 
-    - name: make direcotry
-      file:
-        path: "/home/jenkins/.ssh"
-        state: directory
-        owner: jenkins 
-
-    - name: create empty file
-      file:
-        path: "/home/jenkins/.ssh/authorized_keys"
-        state: touch
-        owner: jenkins
-
-    - name: put pubkey
-      lineinfile:
-        path: "/home/jenkins/.ssh/authorized_keys"
-        line: "{{ pubkey }}"
-        owner: jenkins
-
     - name: Import a key from a url
       ansible.builtin.apt_key:
         url: https://pkg.jenkins.io/debian/jenkins.io.key
-        state: present  
+        state: present
 
     - name: download jenkins binary
-      command: echo "deb https://pkg.jenkins.io/debian-stable binary/" | tee /etc/apt/sources.list.d/jenkins.list
+      command: sh -c "echo deb http://pkg.jenkins-ci.org/debian binary/ > /etc/apt/sources.list.d/jenkins.list"
+      
+    - name: Update apt cache
+      apt: update_cache=yes cache_valid_time=3600
 
     - name: install jenkins
       apt:
@@ -69,7 +52,7 @@
     - name: Just force systemd to re-execute itself
       ansible.builtin.systemd:
         daemon_reload: yes
-      
+
     - name: start service jenkins
       ansible.builtin.systemd:
         name: jenkins
