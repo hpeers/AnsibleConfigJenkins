@@ -52,11 +52,13 @@
     - name: Just force systemd to re-execute itself
       ansible.builtin.systemd:
         daemon_reload: yes
+        scope: system
 
     - name: start service jenkins
       ansible.builtin.systemd:
         name: jenkins
         state: started
+        scope: system
 
     - name: get password
       command: cat /var/lib/jenkins/secrets/initialAdminPassword
