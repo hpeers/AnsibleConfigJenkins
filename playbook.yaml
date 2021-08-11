@@ -26,6 +26,13 @@
         password: ''
         groups: admin
         append: yes
+    
+    - name: Allow 'jenkins' user to have passwordless sudo
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        line: 'jenkins ALL=(ALL) NOPASSWD:ALL'
+        validate: 'visudo -cf %s'
 
     - name: Install acl for Ubuntu Focal
       apt:
