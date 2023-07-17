@@ -3,10 +3,7 @@
   tasks:
 
     - name: Update apt cache
-      apt: update_cache=yes cache_valid_time=3600
-
-    - name: Upgrade all apt packages
-      apt: upgrade=dist
+      apt: update_cache=yes 
 
     - name: Install dependencies
       apt:
@@ -15,10 +12,7 @@
         update_cache: yes
       vars:
         packages:
-        - openjdk-8-jre
-        - curl
-        - git
-        - acl
+        - openjdk-11-jdk
 
     - name: Add jenkins user and append to admin group
       user:
@@ -44,7 +38,7 @@
       command: sh -c "echo deb http://pkg.jenkins-ci.org/debian binary/ > /etc/apt/sources.list.d/jenkins.list"
       
     - name: Update apt cache
-      apt: update_cache=yes cache_valid_time=3600
+      apt: update_cache=yes 
 
     - name: install jenkins
       apt:
