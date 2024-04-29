@@ -2,9 +2,10 @@
   become: yes
   tasks:
 
-    - name: Update apt cache
-      apt: update_cache=yes 
-
+    - name: Update the repository cache 
+        update_cache: yes
+        cache_valid_time: 3600
+        
     - name: Install dependencies
       apt:
         name: "{{ packages }}"
@@ -34,11 +35,11 @@
     #     url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
     #     state: present
     - name: add key for repo
-      shell: wget -O /usr/share/keyrings/jenkins-keyring.asc https://pkg.jenkins.io/debian/jenkins.io-2023.key
+      shell: wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo gpg --dearmor -o /usr/share/keyrings/jenkins.gpg
     
 
     - name: download jenkins binary
-      command: sh -c "echo deb http://pkg.jenkins-ci.org/debian binary/ > /etc/apt/sources.list.d/jenkins.list"
+      shell: sudo sh -c 'echo deb [signed-by=/usr/share/keyrings/jenkins.gpg] http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
       
     - name: Update apt cache
       apt: update_cache=yes 
