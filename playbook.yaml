@@ -29,11 +29,12 @@
         line: 'jenkins ALL=(ALL) NOPASSWD:ALL'
         validate: 'visudo -cf %s'
 
-    - name: Import a key from a url
-      ansible.builtin.apt_key:
-        url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
-        state: present
-
+    # - name: Import a key from a url
+    #   ansible.builtin.apt_key:
+    #     url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+    #     state: present
+    - name: add key for repo
+      shell: wget -O /usr/share/keyrings/jenkins-keyring.asc https://pkg.jenkins.io/debian/jenkins.io-2023.key
     
 
     - name: download jenkins binary
