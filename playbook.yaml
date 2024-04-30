@@ -6,7 +6,7 @@
       ansible.builtin.apt:
         update_cache: yes
         cache_valid_time: 3600
-        
+
     - name: Install dependencies
       apt:
         name: "{{ packages }}"
@@ -23,7 +23,7 @@
         password: ''
         groups: admin
         append: yes
-    
+
     - name: Allow 'jenkins' user to have passwordless sudo
       lineinfile:
         dest: /etc/sudoers
@@ -36,12 +36,12 @@
     #     url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
     #     state: present
     - name: add key for repo
-      shell: wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo gpg --dearmor -o /usr/share/keyrings/jenkins.gpg
-    
+      shell: wget -q -O /usr/share/keyrings/jenkins.gpg https://pkg.jenkins.io/debian-stable/jenkins.io.key
+
 
     - name: download jenkins binary
       shell: sudo sh -c 'echo deb [signed-by=/usr/share/keyrings/jenkins.gpg] http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
-      
+
     - name: Update apt cache
       apt: update_cache=yes 
 
